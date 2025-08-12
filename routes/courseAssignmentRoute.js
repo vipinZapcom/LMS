@@ -3,7 +3,7 @@ const router = express.Router();
 const { verifyToken } = require('../middlewares/auth');
 const CourseAssignment = require('../models/CourseAssignment');
 
-// ✅ Assign a course to a group (Admin only)
+// Assign a course to a group (Admin only)
 router.post('/assign', verifyToken, async (req, res) => {
   try {
     const { courseId, groupId } = req.body;
@@ -27,10 +27,10 @@ router.post('/assign', verifyToken, async (req, res) => {
     // Create assignment
     const assignment = await CourseAssignment.create({ course: courseId, group: groupId });
 
-    console.log('✅ Course assigned:', assignment);
+    console.log('Course assigned:', assignment);
     res.status(201).json({ message: 'Course assigned successfully', assignment });
   } catch (err) {
-    console.error('❌ Assignment error:', err.message);
+    console.error('Assignment error:', err.message);
     res.status(500).json({ message: 'Failed to assign course' });
   }
 });

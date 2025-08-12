@@ -37,7 +37,7 @@ const assignmentRoutes = require('./routes/assignmentRoutes');
 app.use('/api/assignments', assignmentRoutes);
 
 const courseAssignmentRoute = require('./routes/courseAssignmentRoute');
-app.use('/api/course-assign', courseAssignmentRoute); // ✅ matches frontend URL
+app.use('/api/course-assign', courseAssignmentRoute); // matches frontend URL
 
 
 
@@ -55,7 +55,7 @@ app.use('/api/admin', adminRoutes);
 
 // Health check
 app.get('/', (req, res) => {
-  res.send('✅ LMS Backend API is running');
+  res.send('LMS Backend API is running');
 });
 
 // Start the server

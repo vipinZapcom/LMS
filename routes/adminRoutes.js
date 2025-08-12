@@ -10,7 +10,7 @@ router.get('/groups', verifyToken, async (req, res) => {
       return res.status(403).json({ message: 'Only admin can view groups' });
     }
 
-    // ✅ Populating user data
+    // Populating user data
     const groups = await Group.find()
       .populate('users', 'name email') // 👈 key line added here
       .sort({ createdAt: -1 });

@@ -2,14 +2,14 @@ const express = require('express');
 const router = express.Router();
 const { createCourse } = require('../controllers/courseController');
 const { verifyToken } = require('../middlewares/auth');
-const Course = require('../models/Course');
+const Course = require('../models/course');
 const Group = require('../models/Group');
 const CourseAssignment = require('../models/CourseAssignment');
 
-// 📌 Upload a new course
+// Upload a new course
 router.post('/upload', verifyToken, createCourse);
 
-// 📌 Get uploaded courses by instructor
+// Get uploaded courses by instructor
 router.get('/instructor', verifyToken, async (req, res) => {
   try {
     if (req.role !== 'instructor') {
@@ -23,7 +23,7 @@ router.get('/instructor', verifyToken, async (req, res) => {
   }
 });
 
-// 📌 Delete a course (instructor only)
+// Delete a course (instructor only)
 router.delete('/:id', verifyToken, async (req, res) => {
   try {
     const course = await Course.findById(req.params.id);
@@ -41,7 +41,7 @@ router.delete('/:id', verifyToken, async (req, res) => {
   }
 });
 
-// 📌 Get all courses (admin or assignment UI)
+// Get all courses (admin or assignment UI)
 router.get('/all', verifyToken, async (req, res) => {
   try {
     const courses = await Course.find().sort({ createdAt: -1 });
@@ -51,7 +51,7 @@ router.get('/all', verifyToken, async (req, res) => {
   }
 });
 
-// ✅ 📌 Get assigned courses for logged-in user (with logging and instructor info)
+// Get assigned courses for logged-in user (with logging and instructor info)
 router.get('/assigned', verifyToken, async (req, res) => {
   try {
     if (req.role !== 'user') {
@@ -62,7 +62,7 @@ router.get('/assigned', verifyToken, async (req, res) => {
 
     // Find groups that include this user
     const userGroups = await Group.find({ users: req.userId }).select('_id name');
-    console.log('✅ USER GROUPS:', userGroups);
+    console.log('USER GROUPS:', userGroups);
 
     const groupIds = userGroups.map(g => g._id);
 
