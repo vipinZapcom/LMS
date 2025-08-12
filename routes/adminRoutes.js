@@ -1,24 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const { verifyToken } = require('../middlewares/auth');
-const Group = require('../models/Group');
+const adminController = require('../controllers/adminController');
+const { verifyToken, verifyAdmin } = require('../middlewares/auth');
 
-// Get all groups (Only for admin)
-router.get('/groups', verifyToken, async (req, res) => {
-  try {
-    if (req.role !== 'admin') {
-      return res.status(403).json({ message: 'Only admin can view groups' });
-    }
+// Admin Signup & Login
+router.post('/login/admin/signup', adminController.adminSignup);
+router.post('/login/admin/login', adminController.adminLogin);
 
-    // Populating user data
-    const groups = await Group.find()
-      .populate('users', 'name email') // 👈 key line added here
-      .sort({ createdAt: -1 });
-
-    res.json({ groups });
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch groups', error: err.message });
-  }
-});
+// Protected Admin Routes
+router.get('/admin/detail/user/:id', verifyToken, verifyAdmin, adminController.getUserById);
+router.put('/admin/update/user/:id', verifyToken, verifyAdmin, adminController.updateUserById);
+router.delete('/admin/delete/:id', verifyToken, verifyAdmin, adminController.deleteUserById);
 
 module.exports = router;

@@ -15,3 +15,10 @@ exports.verifyToken = (req, res, next) => {
     return res.status(401).json({ message: 'Invalid token' });
   }
 };
+
+exports.verifyAdmin = (req, res, next) => {
+  if (req.role !== 'admin') {
+    return res.status(403).json({ message: 'Admin access required' });
+  }
+  next();
+};
