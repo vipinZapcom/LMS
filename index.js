@@ -37,10 +37,10 @@ mongoose
 app.use('/api/admin', adminRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/group', groupRoutes);
-
-app.use('/api', authRoutes);
 app.use('/api/course', courseRoutes);
-app.use('/api/assignments', assignmentRoutes);
+
+// app.use('/api', authRoutes);
+// app.use('/api/assignments', assignmentRoutes);
 // app.use('/api/course-assign', courseAssignmentRoute); // matches frontend URL
 // app.use('/api/admin', adminRoutes);
 
