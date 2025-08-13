@@ -15,6 +15,7 @@ app.use(express.json());
 app.use(cors());
 
 const adminRoutes = require('./routes/adminRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 const authRoutes = require('./routes/authRoutes');
 const courseRoutes = require('./routes/courseRoutes');
@@ -34,6 +35,7 @@ mongoose
 
 // Routes
 app.use('/api/admin', adminRoutes);
+app.use('/api/user', userRoutes);
 
 app.use('/api', authRoutes);
 app.use('/api/course', courseRoutes);
