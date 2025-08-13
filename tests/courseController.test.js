@@ -2,19 +2,30 @@ const Course = require('../models/Course');
 const courseController = require('../controllers/courseController');
 const jwt = require('jsonwebtoken');
 
+const fs = require('fs');
+const path = require('path');
+
+jest.mock('fs');
+// jest.mock('../models/course');
+
+const mockResponse = () => {
+  const res = {};
+  res.status = jest.fn().mockReturnValue(res);
+  res.json = jest.fn().mockReturnValue(res);
+  res.writeHead = jest.fn();
+  res.pipe = jest.fn();
+  return res;
+};
+
+
+
 // Mock Course model
 jest.mock('../models/Course');
 
 // Mock jwt
 jest.mock('jsonwebtoken');
 
-// Helper to mock Express req/res
-const mockResponse = () => {
-  const res = {};
-  res.status = jest.fn().mockReturnValue(res);
-  res.json = jest.fn().mockReturnValue(res);
-  return res;
-};
+
 
 describe('Course Controller Unit Tests', () => {
   let req, res;
@@ -202,6 +213,88 @@ describe('Course Controller Unit Tests', () => {
     Course.findById.mockRejectedValue(new Error('DB error'));
 
     await assignCourseToGroups(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.json).toHaveBeenCalledWith({ success: false, message: 'DB error' });
+  });
+
+});
+
+describe('Course Video Streaming', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should return 404 if course not found', async () => {
+    Course.findById.mockResolvedValue(null);
+    const req = { params: { course_id: '123' }, headers: {} };
+    const res = mockResponse();
+
+    await courseController.streamCourseVideo(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({ success: false, message: 'Video not found' });
+  });
+
+  it('should return 404 if video file does not exist', async () => {
+    Course.findById.mockResolvedValue({ videoUrl: '/fake/path/video.mp4' });
+    fs.existsSync.mockReturnValue(false);
+
+    const req = { params: { course_id: '123' }, headers: {} };
+    const res = mockResponse();
+
+    await courseController.streamCourseVideo(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({ success: false, message: 'Video file does not exist' });
+  });
+
+  it('should stream entire video if no range header', async () => {
+    const fakePath = '/fake/path/video.mp4';
+    Course.findById.mockResolvedValue({ videoUrl: fakePath });
+    fs.existsSync.mockReturnValue(true);
+    fs.statSync.mockReturnValue({ size: 1000 });
+    fs.createReadStream.mockReturnValue({ pipe: jest.fn() });
+
+    const req = { params: { course_id: '123' }, headers: {} };
+    const res = mockResponse();
+
+    await courseController.streamCourseVideo(req, res);
+
+    expect(res.writeHead).toHaveBeenCalledWith(200, {
+      'Content-Length': 1000,
+      'Content-Type': 'video/mp4',
+    });
+  });
+
+  it('should stream partial video if range header is present', async () => {
+    const fakePath = '/fake/path/video.mp4';
+    const fakeStream = { pipe: jest.fn() };
+    Course.findById.mockResolvedValue({ videoUrl: fakePath });
+    fs.existsSync.mockReturnValue(true);
+    fs.statSync.mockReturnValue({ size: 1000 });
+    fs.createReadStream.mockReturnValue(fakeStream);
+
+    const req = { params: { course_id: '123' }, headers: { range: 'bytes=0-499' } };
+    const res = mockResponse();
+
+    await courseController.streamCourseVideo(req, res);
+
+    expect(res.writeHead).toHaveBeenCalledWith(206, {
+      'Content-Range': 'bytes 0-499/1000',
+      'Accept-Ranges': 'bytes',
+      'Content-Length': 500,
+      'Content-Type': 'video/mp4',
+    });
+    expect(fakeStream.pipe).toHaveBeenCalledWith(res);
+  });
+
+  it('should handle internal server errors', async () => {
+    Course.findById.mockRejectedValue(new Error('DB error'));
+    const req = { params: { course_id: '123' }, headers: {} };
+    const res = mockResponse();
+
+    await courseController.streamCourseVideo(req, res);
 
     expect(res.status).toHaveBeenCalledWith(500);
     expect(res.json).toHaveBeenCalledWith({ success: false, message: 'DB error' });
