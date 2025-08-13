@@ -14,12 +14,14 @@ const port = process.env.PORT || 4000;
 app.use(express.json());
 app.use(cors());
 
+const adminRoutes = require('./routes/adminRoutes');
+
 const authRoutes = require('./routes/authRoutes');
 const courseRoutes = require('./routes/courseRoutes');
 const groupRoutes = require('./routes/groupRoutes');
 const assignmentRoutes = require('./routes/assignmentRoutes');
 const courseAssignmentRoute = require('./routes/courseAssignmentRoute');
-const adminRoutes = require('./routes/adminRoutes');
+// const adminRoutes = require('./routes/adminRoutes');
 
 // Connect to MongoDB
 mongoose
@@ -31,12 +33,14 @@ mongoose
   .catch((err) => console.error('MongoDB connection error:', err.message));
 
 // Routes
+app.use('/api/admin', adminRoutes);
+
 app.use('/api', authRoutes);
 app.use('/api/course', courseRoutes);
 app.use('/api/group', groupRoutes);
 app.use('/api/assignments', assignmentRoutes);
-app.use('/api/course-assign', courseAssignmentRoute); // matches frontend URL
-app.use('/api/admin', adminRoutes);
+// app.use('/api/course-assign', courseAssignmentRoute); // matches frontend URL
+// app.use('/api/admin', adminRoutes);
 
 // Health check
 app.get('/', (req, res) => {

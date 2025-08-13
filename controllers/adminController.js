@@ -1,7 +1,6 @@
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
 // Admin Signup
 exports.adminSignup = async (req, res) => {
   const { name, email, password } = req.body;
@@ -9,8 +8,8 @@ exports.adminSignup = async (req, res) => {
     const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ message: 'User already exists' });
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    await User.create({ name, email, password: hashedPassword, role: 'admin' });
+    // const hashedPassword = await bcrypt.hash(password, 10);
+    await User.create({ name, email, password, role: 'admin' });
 
     res.status(201).json({ message: 'Admin registered successfully' });
   } catch (err) {
@@ -24,7 +23,7 @@ exports.adminLogin = async (req, res) => {
   try {
     const admin = await User.findOne({ email, role: 'admin' });
     if (!admin) return res.status(404).json({ message: 'Admin not found' });
-
+    
     const match = await bcrypt.compare(password, admin.password);
     if (!match) return res.status(401).json({ message: 'Invalid credentials' });
 
@@ -53,6 +52,10 @@ exports.getUserById = async (req, res) => {
 };
 
 // Update User by ID
+
+// here if we are updating the role of admin to user
+// then we should invalidate the token as well otherwise it will contain the 
+// older value of role
 exports.updateUserById = async (req, res) => {
   try {
     const updatedUser = await User.findByIdAndUpdate(
