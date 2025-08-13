@@ -7,7 +7,7 @@ exports.createCourse = async (req, res) => {
   try {
     const course = new Course({
       ...req.body,
-      uploadedBy: req.user.id
+      instructor: req.user.userId
     });
     await course.save();
     return res.status(201).json({ success: true, data: course });
@@ -37,9 +37,8 @@ exports.updateCourse = async (req, res) => {
     if (!course || course.isDeleted) {
       return res.status(404).json({ success: false, message: 'Course not found' });
     }
-
     // Only the original uploader can update
-    if (course.uploadedBy.toString() !== req.user.id) {
+    if (course.instructor.toString() !== req.user.userId) {
       return res.status(403).json({ success: false, message: 'Not authorized to update this course' });
     }
 
@@ -62,7 +61,7 @@ exports.deleteCourse = async (req, res) => {
     }
 
     // Only the original uploader can delete
-    if (course.uploadedBy.toString() !== req.user.id) {
+    if (course.instructor.toString() !== req.user.userId) {
       return res.status(403).json({ success: false, message: 'Not authorized to delete this course' });
     }
 
