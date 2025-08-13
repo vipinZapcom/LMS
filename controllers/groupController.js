@@ -27,6 +27,19 @@ exports.createGroup = async (req, res) => {
   }
 };
 
+// Get group by id
+exports.getGroupById = async (req, res) => {
+  try {
+    const group = await Group.findById(req.params.id).populate('members', 'name email');
+    if (!group) {
+      return res.status(404).json({ message: 'Group not found' });
+    }
+    res.status(200).json(group);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching group', error: error.message });
+  }
+};
+
 // Get all groups
 exports.getAllGroups = async (req, res) => {
   try {
@@ -40,7 +53,7 @@ exports.getAllGroups = async (req, res) => {
 // Delete entire group
 exports.deleteGroup = async (req, res) => {
   try {
-    const { groupId } = req.body;
+    const groupId = req.params.id;
 
     if (!groupId) {
       return res.status(400).json({ message: 'groupId is required' });

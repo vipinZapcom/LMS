@@ -3,15 +3,18 @@ const router = express.Router();
 const groupController = require('../controllers/groupController');
 
 // Create group
-router.post('/api/group/create', groupController.createGroup);
+router.post('/create', groupController.createGroup);
+
+// Get group by id
+router.get('/get/:id', groupController.getGroupById);
 
 // Get all groups
-router.get('/api/group/getAll', groupController.getAllGroups);
+router.get('/getAll', groupController.getAllGroups);
 
 // Delete group
-router.delete('/api/group/delete', groupController.deleteGroup);
+router.delete('/delete/:id', groupController.deleteGroup);
 
 // Delete user from group
-router.delete('/api/group/delete/:groupid/:userid', groupController.deleteUserFromGroup);
+router.delete('/delete/:groupid/:userid', groupController.deleteUserFromGroup);
 
 module.exports = router;
