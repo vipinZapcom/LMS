@@ -144,10 +144,8 @@ describe("Course Controller Unit Tests", () => {
     req.body = { title: "Updated" };
     req.user = { id: userId };
     Course.findById.mockResolvedValue(mockCourse);
-console.log('line 143');
 
     await courseController.updateCourse(req, res);
-console.log('line 146');
 
     expect(mockCourse.title).toBe("Updated");
     expect(mockCourse.save).toHaveBeenCalled();
