@@ -12,7 +12,7 @@ exports.createCourse = async (req, res) => {
     await course.save();
     return res.status(201).json({ success: true, data: course });
   } catch (error) {
-    return res.status(400).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -38,7 +38,7 @@ exports.updateCourse = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Course not found' });
     }
     // Only the original uploader can update
-    if (course.instructor.toString() !== req.user.userId) {
+    if (course.instructor.toString() !== req.user.id) {
       return res.status(403).json({ success: false, message: 'Not authorized to update this course' });
     }
 
@@ -59,9 +59,9 @@ exports.deleteCourse = async (req, res) => {
     if (!course) {
       return res.status(404).json({ success: false, message: 'Course not found' });
     }
-
+    
     // Only the original uploader can delete
-    if (course.instructor.toString() !== req.user.userId) {
+    if (course.instructor.toString() !== req.user.id) {
       return res.status(403).json({ success: false, message: 'Not authorized to delete this course' });
     }
 
@@ -80,7 +80,7 @@ exports.getAllCourses = async (req, res) => {
     const courses = await Course.find({ isDeleted: false });
     return res.status(200).json({ success: true, data: courses });
   } catch (error) {
-    return res.status(400).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
 
