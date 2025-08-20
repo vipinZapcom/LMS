@@ -52,14 +52,21 @@ exports.getAllGroups = async (req, res) => {
 
 // Delete entire group
 exports.deleteGroup = async (req, res) => {
+  console.log('inside deleteGroup');
+  console.log(req.body);
+  
   try {
-    const groupId = req.params.id;
+    const groupId = req.body.id;
+    console.log(`groupId`);
+    console.log(groupId);
 
     if (!groupId) {
       return res.status(400).json({ message: 'groupId is required' });
     }
 
     const deletedGroup = await Group.findByIdAndDelete(groupId);
+console.log(`deletedGroup`);
+console.log(deletedGroup);
 
     if (!deletedGroup) {
       return res.status(404).json({ message: 'Group not found' });

@@ -79,7 +79,7 @@ describe('Group Controller', () => {
     });
 
     it('should return 404 if group not found', async () => {
-      mockReq.body = { groupId: 'id1' };
+      mockReq.body = { id: 'id1' };
       Group.findByIdAndDelete.mockResolvedValue(null);
       await groupController.deleteGroup(mockReq, mockRes);
       expect(mockRes.status).toHaveBeenCalledWith(404);
@@ -87,7 +87,7 @@ describe('Group Controller', () => {
     });
 
     it('should delete group successfully', async () => {
-      mockReq.body = { groupId: 'id1' };
+      mockReq.body = { id: 'id1' };
       Group.findByIdAndDelete.mockResolvedValue({ _id: 'id1' });
       await groupController.deleteGroup(mockReq, mockRes);
       expect(mockRes.status).toHaveBeenCalledWith(200);
@@ -95,7 +95,7 @@ describe('Group Controller', () => {
     });
 
     it('should handle errors during delete', async () => {
-      mockReq.body = { groupId: 'id1' };
+      mockReq.body = { id: 'id1' };
       Group.findByIdAndDelete.mockRejectedValue(new Error('DB error'));
       await groupController.deleteGroup(mockReq, mockRes);
       expect(mockRes.status).toHaveBeenCalledWith(500);
